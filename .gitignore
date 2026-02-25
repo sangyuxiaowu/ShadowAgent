@@ -1,0 +1,49 @@
+# .NET
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.deps.json
+*.runtimeconfig.json
+
+# Publish
+publish/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.suo.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test results
+TestResults/
+*.trx
+
+# NuGet
+.nuget/
+*.nupkg
+packages/
+
+# Rider
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.history/

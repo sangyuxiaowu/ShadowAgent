@@ -1,0 +1,24 @@
+[Unit]
+Description=墨影代理服务 (Shadow Agent Service)
+Documentation=https://github.com/sangyuxiaowu/ShadowAgent
+After=network.target
+
+[Service]
+Type=exec
+Environment="PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin"
+Environment="DOTNET_ROOT=/usr/share/dotnet"
+ExecStart=/bin/bash -c "source /etc/profile.d/dotnet.sh && exec /home/sangsq/workspace/ShadowAgent/publish/ShadowAgent"
+WorkingDirectory=/home/sangsq/workspace/ShadowAgent/publish
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=shadow-agent
+
+# 安全设置
+NoNewPrivileges=false
+ProtectSystem=false
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+{
+  "SocketPath": "/tmp/shadow-agent.sock",
+  "MagicToken": "SHADOW",
+  "LogLevel": "Info",
+  "Commands": {
+    "shutdown": "关机",
+    "reboot": "重启",
+    "status": "状态查询",
+    "ping": "心跳检测"
+  }
+}
