@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using ShadowAgent.Commands;
+using ShadowAgent.Plugins;
 
 namespace ShadowAgent;
 
@@ -10,7 +11,8 @@ public class Program
 {
     private static Socket? _listener;
     private static bool _running = true;
-    private static CommandRegistry? _registry;
+    private static ExtendedCommandRegistry? _registry;
+    private static PluginManager? _pluginManager;
     private static string _socketPath = "/tmp/shadow-agent.sock";
     private static string _magicToken = "SHADOW";
 
@@ -28,20 +30,38 @@ public class Program
             Console.WriteLine($"已清理旧的 socket 文件");
         }
 
-        // 注册所有命令
+        // 创建扩展的命令注册表（初始只有ping命令）
         var commands = new List<ICommand>
         {
-            new ShutdownCommand(),
-            new RebootCommand(),
-            new StatusCommand(),
             new PingCommand(),
         };
         
-        // 创建注册表（HelpCommand 需要其他命令列表）
-        var helpCommand = new HelpCommand(commands);
-        commands.Add(helpCommand);
+        _registry = new ExtendedCommandRegistry(commands);
         
-        _registry = new CommandRegistry(commands);
+        // 创建插件管理器
+        _pluginManager = new PluginManager(_registry);
+        
+        // 加载所有插件
+        await _pluginManager.LoadAllPluginsAsync();
+        
+        // 创建status命令（需要插件管理器）
+        var statusCommand = new StatusCommand(_pluginManager);
+        _registry.RegisterCommand(statusCommand);
+        
+        // 注册插件管理命令
+        var pluginCommands = new List<ICommand>
+        {
+            new LoadPluginCommand(_pluginManager),
+            new UnloadPluginCommand(_pluginManager),
+            new ListPluginsCommand(_pluginManager),
+            new ReloadPluginsCommand(_pluginManager),
+        };
+        
+        _registry.RegisterCommands(pluginCommands);
+        
+        // 创建帮助命令（需要所有命令列表）
+        var helpCommand = new HelpCommand(_registry.GetAllCommands());
+        _registry.RegisterCommand(helpCommand);
 
         // 创建 Unix Domain Socket 监听器
         _listener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
